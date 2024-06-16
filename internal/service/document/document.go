@@ -8,35 +8,38 @@ import (
 
 	"Gin-Api/internal/dto"
 	"Gin-Api/internal/model"
-	"Gin-Api/internal/repo/document"
 )
 
 type DocumentService struct {
-	docRepo *document.DocumentRepository
+	documentStorage DocumentStorage
+}
+type DocumentStorage interface {
+	CreateDoc(context.Context, *model.Document) error
+	GetDoc(context.Context, string) (*model.Document, error)
 }
 
-func NewDocumentService(documentRepository *document.DocumentRepository) *DocumentService {
+func NewDocumentService(docStorage DocumentStorage) *DocumentService {
 	return &DocumentService{
-		docRepo: documentRepository,
+		documentStorage: docStorage,
 	}
 }
 
-func (ds *DocumentService) CreateDocument(ctx context.Context, request *dto.CreateDocumentRequest) (*model.Document, error) {
+func (ds *DocumentService) CreateDocument(ctx context.Context, request *dto.CreateDocumentRequest) error {
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
-	createdDoc, err := ds.docRepo.CreateDocument(ctx, request)
+	err := ds.documentStorage.CreateDoc(ctx, nil)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return createdDoc, nil
+	return nil
 }
 
 func (ds *DocumentService) GetDocument(req *dto.GetDocumentRequest) (*model.Document, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	document, err := ds.docRepo.GetDocument(ctx, req.Title)
+	document, err := ds.documentStorage.GetDoc(ctx, req.Title)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, model.ErrDocumentNotFound

@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"log"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 func Init(db *sql.DB) error {
@@ -18,9 +20,15 @@ func Init(db *sql.DB) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	_, err := db.ExecContext(ctx, query)
+
+	preparedQuery, err := db.PrepareContext(ctx, query)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "problem in sql syntax")
+	}
+
+	_, err = preparedQuery.ExecContext(ctx)
+	if err != nil {
+		return errors.Wrap(err, "problem execute query")
 	}
 
 	// Document
@@ -28,39 +36,18 @@ func Init(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS documents (
 		id UUID PRIMARY KEY,
 		title TEXT UNIQUE,
-		content TEXT
+		content TEXT, 
+		expiry_date timestamp
 	);`
 
 	_, err = db.ExecContext(ctx, queryD)
 	if err != nil {
+		// нужно вместо log.Printf писать return errors.Wrap(err, "Error creating documents table")
 		log.Printf("Error creating documents table: %v", err)
 		return err
 	}
+
 	log.Println("Documents table created or already exists")
 
-	// Проверяем структуру таблицы documents
-	checkDocumentsTableStructure(db)
-
 	return nil
-}
-
-func checkDocumentsTableStructure(db *sql.DB) {
-	rows, err := db.Query("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'documents'")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer rows.Close()
-
-	log.Println("Columns in documents table:")
-	for rows.Next() {
-		var columnName, dataType string
-		if err := rows.Scan(&columnName, &dataType); err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("Column Name: %s, Data Type: %s\n", columnName, dataType)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.Fatal(err)
-	}
 }

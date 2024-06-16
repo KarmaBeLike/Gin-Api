@@ -14,10 +14,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-func OpenDB(cfg config.Config) (*sql.DB, error) {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		cfg.Host, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName)
+func OpenDB(cfg *config.Config) (*sql.DB, error) {
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		cfg.Host,
+		cfg.DBPort,
+		cfg.DBUser,
+		cfg.DBPassword,
+		cfg.DBName)
 
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {

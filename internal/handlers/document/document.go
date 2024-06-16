@@ -34,7 +34,7 @@ func (dc *DocumentClient) CreateDocument(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	doc, err := dc.docServ.CreateDocument(ctx, &request)
+	err = dc.docServ.CreateDocument(ctx, &request)
 	if err != nil {
 		if errors.Is(err, model.ErrDuplicateTitle) {
 			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": "a title already exists"})
@@ -44,7 +44,7 @@ func (dc *DocumentClient) CreateDocument(ctx *gin.Context) {
 			return
 		}
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "document successfully created", "title": doc.Title, "content": doc.Content, "id": doc.ID})
+	ctx.JSON(http.StatusOK, gin.H{"message": "document successfully created"})
 }
 
 func (dc *DocumentClient) GetDocument(ctx *gin.Context) {
@@ -64,5 +64,11 @@ func (dc *DocumentClient) GetDocument(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"document": document})
+	ctx.JSON(http.StatusOK, gin.H{
+		"1": gin.H{"message": "document successfully read"},
+		"2": gin.H{
+			"ID":    document.ID,
+			"title": document.Title, "content": document.Content,
+		},
+	})
 }
