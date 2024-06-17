@@ -28,7 +28,14 @@ func (ds *DocumentService) CreateDocument(ctx context.Context, request *dto.Crea
 	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
 
-	err := ds.documentStorage.CreateDoc(ctx, nil)
+	document := &model.Document{
+		Title:      request.Title,
+		Content:    request.Content,
+		UserID:     request.UserID,
+		ExpiryDate: time.Now().Add(7 * 24 * time.Hour),
+	}
+
+	err := ds.documentStorage.CreateDoc(ctx, document)
 	if err != nil {
 		return err
 	}

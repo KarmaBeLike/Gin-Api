@@ -81,7 +81,7 @@ func (c *UserClient) SignIn(ctx *gin.Context) {
 		}
 	}
 	token := c.service.CreateToken(user)
-	c.redis.Set(token, 1, time.Minute)
+	c.redis.Set(token, user.ID, time.Minute)
 	ctx.JSON(http.StatusOK, gin.H{"message": "User successful logged in"})
 }
 

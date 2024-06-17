@@ -34,7 +34,7 @@ func Init(db *sql.DB) error {
 	// Document
 	queryD := `
 	CREATE TABLE IF NOT EXISTS documents (
-		id UUID PRIMARY KEY,
+		id SERIAL PRIMARY KEY,
 		title TEXT UNIQUE,
 		content TEXT, 
 		expiry_date timestamp

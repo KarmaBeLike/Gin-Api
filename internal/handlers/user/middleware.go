@@ -15,15 +15,16 @@ func (u *UserClient) BasicAuthMiddleware() gin.HandlerFunc {
 		}
 
 		authToken := authHeader[6:]
-		isAuth, err := u.redis.Get(authToken).Result()
+		userID, err := u.redis.Get(authToken).Int()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
-		if isAuth == "" {
+		if userID == 0 {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			return
 		}
+		c.Set("userID", userID)
 		c.Next()
 	}
 }

@@ -10,6 +10,7 @@ import (
 	service "Gin-Api/internal/service/document"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type DocumentClient struct {
@@ -34,6 +35,11 @@ func (dc *DocumentClient) CreateDocument(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	request.UserID = uuid.New()
+	// userID, ok := ctx.Get("userID")
+	// request.UserID =
+	// if false
 	err = dc.docServ.CreateDocument(ctx, &request)
 	if err != nil {
 		if errors.Is(err, model.ErrDuplicateTitle) {

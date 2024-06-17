@@ -3,6 +3,7 @@ package document
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"Gin-Api/internal/model"
 )
@@ -18,10 +19,10 @@ func NewDocumentRepository(db *sql.DB) *DocumentRepository {
 }
 
 func (dr *DocumentRepository) CreateDoc(ctx context.Context, document *model.Document) error {
-	query := `INSERT INTO documents (id, title, content,expiry_date)            
-              VALUES ($1, $2, $3, $4)
-              RETURNING id, title, content` // вставляет новый документ в таблицу. возвращаем для проверки,что данные были вставлены корректно, и эти данные могут быть использованы в дальнейшем в приложении без необходимости выполнять дополнительный запрос для их получения.
-	_, err := dr.db.ExecContext(ctx, query, document.ID, document.Title, document.Content)
+	fmt.Println("document", document, "________________________")
+	query := `INSERT INTO documents (title, content, expiry_date)            
+              VALUES ($1, $2, $3)` // вставляет новый документ в таблицу. возвращаем для проверки,что данные были вставлены корректно, и эти данные могут быть использованы в дальнейшем в приложении без необходимости выполнять дополнительный запрос для их получения.
+	_, err := dr.db.ExecContext(ctx, query, document.Title, document.Content, document.ExpiryDate)
 	if err != nil {
 		return err
 	}
