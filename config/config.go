@@ -7,7 +7,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// TODO: Do not forget to add config.yaml
 const configFile = "config.yaml"
 
 type Config struct {
@@ -26,12 +25,12 @@ func Load() (*Config, error) {
 	config := &Config{}
 	rawYaml, err := os.ReadFile(configFile)
 	if err != nil {
-		return nil, errors.Wrap(err, "reading config file")
+		return nil, errors.Wrap(err, "failed to read config file")
 	}
 
-	err = yaml.Unmarshal(rawYaml, &config)
+	err = yaml.Unmarshal(rawYaml, config)
 	if err != nil {
-		return nil, errors.Wrap(err, "parsing yaml")
+		return nil, errors.Wrap(err, "failed to parse yaml")
 	}
 	return config, nil
 }

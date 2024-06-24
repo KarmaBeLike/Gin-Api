@@ -12,7 +12,7 @@ var (
 	ErrRecordNotFound     = errors.New("record not found")
 )
 
-type User struct { // закидываем в бд, внутренняя структура
+type User struct {
 	ID             uuid.UUID `json:"id"`
 	UserName       string    `json:"username" binding:"required" validate:"min=8,containsany=!@#?*"`
 	Email          string    `json:"email" binding:"required,email"`

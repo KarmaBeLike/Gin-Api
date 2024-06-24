@@ -15,7 +15,7 @@ import (
 type (
 	UserStorage interface {
 		CreateUser(context.Context, *dto.RegistrationRequest, []byte) error
-		GetUser(context.Context, string) (*model.User, error)
+		GetUser(ctx context.Context, username string) (*model.User, error)
 	}
 
 	UserService struct {
@@ -23,7 +23,7 @@ type (
 	}
 )
 
-func NewUserService(userStorage UserStorage) *UserService { // получили возможность создать user и отдаем возможность хэшировать пароль и отдаем возможность создать user
+func NewUserService(userStorage UserStorage) *UserService {
 	return &UserService{
 		userStorage: userStorage,
 	}

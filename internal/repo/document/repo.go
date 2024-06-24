@@ -21,7 +21,7 @@ func NewDocumentRepository(db *sql.DB) *DocumentRepository {
 func (dr *DocumentRepository) CreateDoc(ctx context.Context, document *model.Document) error {
 	fmt.Println("document", document, "________________________")
 	query := `INSERT INTO documents (title, content, expiry_date)            
-              VALUES ($1, $2, $3)` // вставляет новый документ в таблицу. возвращаем для проверки,что данные были вставлены корректно, и эти данные могут быть использованы в дальнейшем в приложении без необходимости выполнять дополнительный запрос для их получения.
+              VALUES ($1, $2, $3)`
 	_, err := dr.db.ExecContext(ctx, query, document.Title, document.Content, document.ExpiryDate)
 	if err != nil {
 		return err
@@ -35,7 +35,7 @@ func (dr *DocumentRepository) GetDoc(ctx context.Context, title string) (*model.
 	FROM documents
 	WHERE title = $1;`
 	document := &model.Document{}
-	err := dr.db.QueryRowContext(ctx, query, title).Scan( // выполняет запрос, подставляя значения document.ID, document.Title и document.Content в параметры $1, $2 и $3
+	err := dr.db.QueryRowContext(ctx, query, title).Scan(
 		&document.ID,
 		&document.Title,
 		&document.Content,

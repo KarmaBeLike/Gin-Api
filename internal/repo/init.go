@@ -42,7 +42,7 @@ func Init(db *sql.DB) error {
 
 	_, err = db.ExecContext(ctx, queryD)
 	if err != nil {
-		// нужно вместо log.Printf писать return errors.Wrap(err, "Error creating documents table")
+
 		log.Printf("Error creating documents table: %v", err)
 		return err
 	}
