@@ -37,9 +37,7 @@ func (dc *DocumentClient) CreateDocument(ctx *gin.Context) {
 	}
 
 	request.UserID = uuid.New()
-	// userID, ok := ctx.Get("userID")
-	// request.UserID =
-	// if false
+
 	err = dc.docServ.CreateDocument(ctx, &request)
 	if err != nil {
 		if errors.Is(err, model.ErrDuplicateTitle) {

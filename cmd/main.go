@@ -50,9 +50,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	repo := userRepo.NewUserRepository(db)                  // возможность создавать user в бд
-	service := userServ.NewUserService(repo)                // логика
-	handler := userHand.NewUserClient(service, redisClient) // пользователь
+	repo := userRepo.NewUserRepository(db)
+	service := userServ.NewUserService(repo)
+	handler := userHand.NewUserClient(service, redisClient)
 
 	documentRepo := docRepo.NewDocumentRepository(db)
 	documentService := docServ.NewDocumentService(documentRepo)
@@ -86,21 +86,7 @@ func main() {
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("listen: %s\n", err)
 	}
-	// err = router.Run(fmt.Sprintf(":%v", cfg.Port))
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 	<-done
 	log.Println("Server stopped")
 }
-
-// type closure struct {
-// 	toClose []func
-// }
-
-// func (c *closure) add(f func) {
-
-// }
-
-// func (c *closure) CloseAll() {}

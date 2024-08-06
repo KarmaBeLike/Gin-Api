@@ -35,7 +35,7 @@ func (dr *DocumentRepository) GetDoc(ctx context.Context, title string) (*model.
 	FROM documents
 	WHERE title = $1;`
 	document := &model.Document{}
-	err := dr.db.QueryRowContext(ctx, query, title).Scan( // выполняет запрос, подставляя значения document.ID, document.Title и document.Content в параметры $1, $2 и $3
+	err := dr.db.QueryRowContext(ctx, query, title).Scan(
 		&document.ID,
 		&document.Title,
 		&document.Content,

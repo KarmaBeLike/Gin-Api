@@ -23,7 +23,7 @@ type (
 	}
 )
 
-func NewUserService(userStorage UserStorage) *UserService { // получили возможность создать user и отдаем возможность хэшировать пароль и отдаем возможность создать user
+func NewUserService(userStorage UserStorage) *UserService {
 	return &UserService{
 		userStorage: userStorage,
 	}

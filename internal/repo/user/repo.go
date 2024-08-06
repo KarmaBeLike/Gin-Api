@@ -16,7 +16,7 @@ type userRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) *userRepository { // позволяет создавать user в таблице users в бд
+func NewUserRepository(db *sql.DB) *userRepository {
 	return &userRepository{db: db}
 }
 
@@ -32,24 +32,12 @@ func (ur *userRepository) CreateUser(ctx context.Context, request *dto.Registrat
 
 	err := ur.db.QueryRowContext(ctx, query, user.ID, user.UserName, user.Email, user.HashedPassword).Scan(&user.ID)
 	if err != nil {
-		// var pqErr *pq.Error
-
-		// if errors.As(err, &pqErr) {
-		// 	if pqErr.Code == "23505" {
-		// 		return errs.Wrap(pqErr, "user is exist")
-		// 	}
-
-		// 	if pqErr.Code == ""
-		// }
 		switch {
 		case err.Error() == `pq: duplicate key value violates unique constraint"users_email_key"`:
 			return model.ErrDuplicateEmail
 		default:
 			return err
 		}
-
-		// if errors.As(err, sql) {
-		// }
 	}
 	return nil
 }
@@ -70,12 +58,3 @@ func (ur *userRepository) GetUser(ctx context.Context, username string) (*model.
 
 	return user, nil
 }
-
-// func switchError(err error) error {
-// 	switch {
-// 	case errors.Is(err, sql.ErrNoRows):
-
-// 	case errors.Is(err, sql.ErrTxDone):
-
-// 	}
-// }

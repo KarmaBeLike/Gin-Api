@@ -35,7 +35,6 @@ func (c *UserClient) Routes(r *gin.Engine, cfg *config.Config) {
 	r.POST("signin", c.SignIn)
 
 	r.POST("/test", c.BasicAuthMiddleware(), func(c *gin.Context) {
-		// Если middleware пропускает запрос, отправляем ответ с сообщением об успешном доступе
 		c.JSON(http.StatusOK, gin.H{"message": "you have access"})
 	})
 }
