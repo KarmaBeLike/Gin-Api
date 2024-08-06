@@ -16,12 +16,12 @@ type userRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(db *sql.DB) *userRepository { // позволяет создавать user в таблице users в бд
+func NewUserRepository(db *sql.DB) *userRepository {
 	return &userRepository{db: db}
 }
 
 func (ur *userRepository) CreateUser(ctx context.Context, request *dto.RegistrationRequest, hashPassword []byte) error {
-	query := `INSERT INTO users(id, username, email, password_hash) VALUES ($1,$2,$3,$4) RETURNING id`
+	query := `INSERT INTO users(id, username, email, password_hash) VALUES ($1,$2,$3,$4)`
 
 	user := model.User{
 		ID:             uuid.New(),
@@ -30,23 +30,17 @@ func (ur *userRepository) CreateUser(ctx context.Context, request *dto.Registrat
 		HashedPassword: hashPassword,
 	}
 
-	err := ur.db.QueryRowContext(ctx, query, user.ID, user.UserName, user.Email, user.HashedPassword).Scan(&user.ID)
+	_, err := ur.db.ExecContext(ctx, query, user.ID, user.UserName, user.Email, user.HashedPassword)
 	if err != nil {
-		// var pqErr *pq.Error
+		var pqErr *pq.Error
 
-		// if errors.As(err, &pqErr) {
-		// 	if pqErr.Code == "23505" {
-		// 		return errs.Wrap(pqErr, "user is exist")
-		// 	}
+		if errors.As(err, &pqErr) {
+			if pqErr.Code == "23505" {
+				return errs.Wrap(pqErr, "user is exist")
+			}
 
 		// 	if pqErr.Code == ""
 		// }
-		switch {
-		case err.Error() == `pq: duplicate key value violates unique constraint"users_email_key"`:
-			return model.ErrDuplicateEmail
-		default:
-			return err
-		}
 
 		// if errors.As(err, sql) {
 		// }
@@ -55,7 +49,7 @@ func (ur *userRepository) CreateUser(ctx context.Context, request *dto.Registrat
 }
 
 func (ur *userRepository) GetUser(ctx context.Context, username string) (*model.User, error) {
-	query := `SELECT id, username,email,password_hash FROM users WHERE username=$1;`
+	query := `SELECT id, username, email, password_hash FROM users WHERE username=$1;`
 	user := &model.User{}
 
 	err := ur.db.QueryRowContext(ctx, query, username).Scan(
@@ -65,12 +59,14 @@ func (ur *userRepository) GetUser(ctx context.Context, username string) (*model.
 		&user.HashedPassword,
 	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrUserNotFound // Определите эту ошибку в вашем пакете model
+		}
 		return nil, err
 	}
 
 	return user, nil
 }
-
 // func switchError(err error) error {
 // 	switch {
 // 	case errors.Is(err, sql.ErrNoRows):

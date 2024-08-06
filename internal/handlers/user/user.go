@@ -44,7 +44,7 @@ func (c *UserClient) SignUp(ctx *gin.Context) {
 	var request dto.RegistrationRequest
 	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error 1": err.Error()})
 		return
 	}
 	err = c.service.RegisterUser(&request)
@@ -53,9 +53,9 @@ func (c *UserClient) SignUp(ctx *gin.Context) {
 			ctx.JSON(http.StatusUnprocessableEntity, gin.H{"error": "a user with this email address already exists"})
 			return
 		} else {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
+		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "User succcessfully registered"})
 }

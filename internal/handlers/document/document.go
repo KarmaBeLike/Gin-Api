@@ -6,6 +6,7 @@ import (
 
 	"Gin-Api/config"
 	"Gin-Api/internal/dto"
+	"Gin-Api/internal/handlers/detector"
 	"Gin-Api/internal/model"
 	service "Gin-Api/internal/service/document"
 
@@ -24,7 +25,7 @@ func NewDocumentClient(service *service.DocumentService) *DocumentClient {
 }
 
 func (dc *DocumentClient) Routes(r *gin.Engine, cfg *config.Config) {
-	r.GET("getdoc", dc.GetDocument)
+	r.GET("documents/:id", dc.GetDocument)
 	r.POST("documents", dc.CreateDocument)
 }
 
@@ -32,7 +33,8 @@ func (dc *DocumentClient) CreateDocument(ctx *gin.Context) {
 	var request dto.CreateDocumentRequest
 	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+
+		ctx.JSON(detector.ErrorDetector(err))
 		return
 	}
 
@@ -54,7 +56,13 @@ func (dc *DocumentClient) CreateDocument(ctx *gin.Context) {
 }
 
 func (dc *DocumentClient) GetDocument(ctx *gin.Context) {
-	var request dto.GetDocumentRequest
+	id := ctx.Param("id")
+	if id == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	request := dto.GetDocumentRequest{ID: id}
 	err := ctx.ShouldBindJSON(&request)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

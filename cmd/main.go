@@ -19,7 +19,7 @@ import (
 
 	docHand "Gin-Api/internal/handlers/document"
 
-	"Gin-Api/internal/redis"
+	"Gin-Api/internal/database/redis"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -39,8 +39,7 @@ func main() {
 
 	redisClient, err := redis.NewRedisClient(cfg)
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	router := gin.Default()
@@ -50,8 +49,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	repo := userRepo.NewUserRepository(db)                  // возможность создавать user в бд
-	service := userServ.NewUserService(repo)                // логика
+	userRepo := userRepo.NewUserRepository(db)              // возможность создавать user в бд
+	service := userServ.NewUserService(userRepo)            // логика
 	handler := userHand.NewUserClient(service, redisClient) // пользователь
 
 	documentRepo := docRepo.NewDocumentRepository(db)
